@@ -1,12 +1,19 @@
 require './movie.rb'
 class Movie
-  attr_accessor :href, :name, :year, :country, :date, :genres, :duration, :rank, :director, :actors
+  attr_reader :href, :name, :year, :country, :date, :genres, :duration, :rank, :director, :actors
 
-  def initialize (creator = MovieCollection.new, params = {})
+  def initialize (creator, href:, name:, year:, country:, date:, genres:, duration:, rank:, director:, actors:)
     @creator = creator
-    params.each do |key, value|
-      instance_variable_set("@#{key}", value)
-    end
+    @href = href
+    @name = name
+    @year = year
+    @country = country
+    @date = date
+    @genres = genres
+    @duration = duration
+    @rank = rank
+    @director = director
+    @actors = actors
   end
 
   def to_s
@@ -14,12 +21,24 @@ class Movie
   end
 
   def has_genre?(genre)
-    if @creator.has_genre?(genre)
-      genres.include?(genre) ? true : false
-    else # raise error
-      raise "Movie list has no such genre"
-    end
+    raise "Movie list has no such genre" unless @creator.has_genre?(genre)
+    return genres.include?(genre) 
   end
 
+  def duration_sort
+    @duration[0..-3].to_i
+  end
+
+  def director_sort
+    @director.split(' ').last
+  end  
+
+  def month
+    @date[5..6].to_i 
+  end
+
+  def year
+    @date[0..3].to_i
+  end
 
 end

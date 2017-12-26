@@ -15,39 +15,35 @@ class MovieCollection
   def sort_by(field_name)  
     case field_name
     when :duration
-      @films_array.sort_by { |film| film.duration[0..-3].to_f }
+      @films_array.sort_by(&:duration_sort)
     when :director 
-      @films_array.sort_by { |film| film.director.split(' ').last }
+      @films_array.sort_by(&:director_sort)
     else
       @@keys_array.include?(field_name) ? @films_array.sort_by(&field_name) : "Unknown field name #{field_name}, use #{@@keys_array}"
     end
   end
 
-  def filter(field_value = {})
-    ret = []
-    field_value.each do |key, value|
-      ret << @films_array.select { |film| film.send(key).include?(value) }
-    end
-    return ret
+  def filter(field_value )
+
+    return @films_array  if field_value.empty?
+
+    cur_filter = field_value.first #[0] - key, [1] - value
+    key = cur_filter[0]
+    value = cur_filter[1]
+    field_value.delete(key)
+    filter(field_value).select { |film| film.send(key).to_s.include?(value) }    
+
   end
 
   def stats(field_name)
     stat_hash = {}
     case field_name
-    when :director
-      stat_hash = @films_array.group_by(&:director).map { |director, director_films| [director, director_films.count] }.to_h
-    when :month
-      stat_hash = @films_array.group_by { |film| film.date[5..6].to_i }.map { |month, months_films| [month, months_films.count] }.to_h
-    when :year
-      stat_hash = @films_array.group_by { |film| film.date[0..3].to_i }.map { |year, year_films| [year, year_films.count] }.to_h
-    when :actor then
-      stat_hash = @films_array.each_with_object(Hash.new(0)) { |str, hsh| str.send(:actors).split(',').each { |actor| hsh[actor] += 1 } }
-    when :country
-      stat_hash = @films_array.each_with_object(Hash.new(0)) { |str, hsh| str.send(:country).split(',').each do |country| hsh[country] += 1 end }
-    when :genre
-      stat_hash =  @films_array.each_with_object(Hash.new(0)) { |str, hsh| str.send(:genres).split(',').each do |genre| hsh[genre] += 1 end }
+    when :director, :month, :year
+      stat_hash = @films_array.group_by(&field_name).map { |field, field_films| [field, field_films.count] }.to_h
+    when :actors, :country, :genres 
+      stat_hash = @films_array.each_with_object(Hash.new(0)) { |str, hsh| str.send(field_name).split(',').each { |field| hsh[field] += 1 } }
     else 
-      { error: "Unknown field name #{field_name}, use :director, :actor, :year, :month, :country, :genre" }
+      { error: "Unknown field name #{field_name}, use :director, :actors, :year, :month, :country, :genres" }
     end
   end
 

@@ -23,21 +23,26 @@ puts "\n\n"
 puts "movies.all.first.href"
 puts movies.all.first.href
 puts "\n\n"
-puts "Comedies"
-puts movies.filter(genres: 'Comedy')
+
+
+puts "5 Comedies USA"
+puts movies.filter(genres: 'Comedy', country: 'USA').first(5)
 puts "\n\n"
-puts "USA's films"
+puts "5 USA's films"
 puts movies.filter(country: 'USA').first(5)
+puts "\n\n"
+puts "5 Drama USA's films of 2015"
+puts movies.filter(country: 'USA', genres: 'Comedy', year: '2015').first(5)
 puts "\n\n"
 
 puts "stats director"
 puts movies.stats(:director)
 puts "stats actor"
-puts movies.stats(:actor)
+puts movies.stats(:actors)
 puts "stats country"
 puts movies.stats(:country)
 puts "stats genre"
-puts movies.stats(:genre)
+puts movies.stats(:genres)
 puts "#{movies.all.first}  has genre Comedy?"
 puts movies.all.first.has_genre?('Comedy')
 puts "#{movies.all.first}  has genre Drama?"
