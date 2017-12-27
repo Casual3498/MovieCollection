@@ -25,8 +25,8 @@ puts movies.all.first.href
 puts "\n\n"
 
 
-puts "5 Comedies USA"
-puts movies.filter(genres: 'Comedy', country: 'USA').first(5)
+puts "5 Comedies France"
+puts movies.filter(genres: 'Comedy', country: 'France').first(5)
 puts "\n\n"
 puts "5 USA's films"
 puts movies.filter(country: 'USA').first(5)
