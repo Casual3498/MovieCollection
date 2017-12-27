@@ -25,11 +25,7 @@ class MovieCollection
 
   def filter(field_value )
 
-    @films_array.each_with_object([]) { |movie, mas| 
-        find = true 
-        field_value.each_pair { |key, value| unless movie.send(key).to_s.include?(value) then find = false end }
-        mas << movie if find
-     } 
+    @films_array.select { |movie| !field_value.find { |key, value| !movie.send(key).to_s.include?(value) } } 
 
   end
 
