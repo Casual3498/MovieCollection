@@ -14,10 +14,8 @@ class MovieCollection
 
   def sort_by(field_name)  
     case field_name
-    when :duration
-      @films_array.sort_by(&:duration_sort)
     when :director 
-      @films_array.sort_by(&:director_sort)
+      @films_array.sort_by(&:director_last_name)
     else
       @@keys_array.include?(field_name) ? @films_array.sort_by(&field_name) : "Unknown field name #{field_name}, use #{@@keys_array}"
     end
@@ -35,7 +33,7 @@ class MovieCollection
     when :director, :month, :year
       stat_hash = @films_array.group_by(&field_name).map { |field, field_films| [field, field_films.count] }.to_h
     when :actors, :country, :genres 
-      stat_hash = @films_array.each_with_object(Hash.new(0)) { |str, hsh| str.send(field_name).split(',').each { |field| hsh[field] += 1 } }
+      stat_hash = @films_array.each_with_object(Hash.new(0)) { |str, hsh| str.send(field_name).each { |field| hsh[field] += 1 } }
     else 
       { error: "Unknown field name #{field_name}, use :director, :actors, :year, :month, :country, :genres" }
     end

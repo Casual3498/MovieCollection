@@ -7,17 +7,19 @@ class Movie
     @href = href
     @name = name
     @year = year
-    @country = country
+    @country = country.split(',')
     @date = date
-    @genres = genres
-    @duration = duration
+    @genres = genres.split(',')
+    @duration = duration.split(" ")[0].to_i
+    @duration_unit = :"#{duration.split(" ")[1]}"
     @rank = rank
     @director = director
-    @actors = actors
+    @actors = actors.split(',')
+    raise "Duration time unit #@duration_unit is uncorrect" unless @duration_unit == :min
   end
 
   def to_s
-    "#@name :(#@date ; #@genres) - #@duration country:#@country \n-----------"
+    "#@name :(#@date ; #{@genres.join(',')}) - #@duration #@duration_unit country:#{@country.join(',')} \n-----------"
   end
 
   def has_genre?(genre)
@@ -25,11 +27,7 @@ class Movie
     return genres.include?(genre) 
   end
 
-  def duration_sort
-    @duration[0..-3].to_i
-  end
-
-  def director_sort
+  def director_last_name
     @director.split(' ').last
   end  
 
@@ -45,14 +43,7 @@ class Movie
     case field
     
     when :actors, :country, :genres 
-      self.send(field).split(',').any? { |elem| value.match(elem) }
-    
-    when :month, :year, :duration  
-      if (String === value ) 
-        value.to_i === self.send(field)
-      else
-        value === self.send(field)
-      end
+      self.send(field).any? { |elem| value.match(elem) } 
     else
       value === self.send(field)
     end
