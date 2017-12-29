@@ -28,29 +28,28 @@ class MovieCollection
   end
 
   def stats(field_name)
-    stat_hash = {}
-    case field_name
-    when :director, :month, :year
-      stat_hash = @films_array.group_by(&field_name).map { |field, field_films| [field, field_films.count] }.to_h
-    when :actors, :country, :genres 
-      stat_hash = @films_array.each_with_object(Hash.new(0)) { |str, hsh| str.send(field_name).each { |field| hsh[field] += 1 } }
-    else 
-      { error: "Unknown field name #{field_name}, use :director, :actors, :year, :month, :country, :genres" }
-    end
+
+    @films_array.each_with_object(Hash.new(0)) { |str, hsh| Array(str.send(field_name)).each { |field| hsh[field] += 1 } }
+
   end
 
   def has_genre?(genre)
-    @films_array.each do |film|
-      return true if film.genres.include?(genre)
-    end
-    return false
+
+    @genres.include?(genre)
+
   end
 
   private
+
   @@keys_array = %i[href name year country date genres duration rank director actors]
-  @films_array = []  
+  @films_array = [] 
+  @genres = []
+
   def initialize (filename = 'movies.txt')
-    @films_array = CSV.read(filename, col_sep: '|', headers: @@keys_array).map { |string| Movie.new(self, string.to_h) }    
+    @films_array = CSV.read(filename, col_sep: '|', headers: @@keys_array).map do |string| 
+      @genres = Array(@genres) + Array(string.to_h[:genres])       # cache genres
+      Movie.new(self, string.to_h) 
+    end
   end
 
 
