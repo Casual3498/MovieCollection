@@ -3,7 +3,7 @@ require './movie_collection.rb'
 movies =  MovieCollection.new('movies.txt')
 
 
-puts movies.all
+# puts movies.all
 puts "\n\n"
 puts "first 5 sort by :name"
 puts movies.sort_by(:name).first(5)
