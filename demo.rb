@@ -51,7 +51,7 @@ puts "\n\n"
 
 
 puts "films with actor /Hoffma/"
-puts movies.filter(actors: /Hoffma/)
+puts movies.filter(actors: /Hoffma/).first(5)
 puts "\n\n"
 
 

@@ -11,15 +11,15 @@ class Movie
     @date = date
     @genres = genres.split(',')
     @duration = duration.split(" ")[0].to_i
-    @duration_unit = :"#{duration.split(" ")[1]}"
+    # @duration_unit = :"#{duration.split(" ")[1]}"
     @rank = rank
     @director = director
     @actors = actors.split(',')
-    raise "Duration time unit #@duration_unit is uncorrect" unless @duration_unit == :min
+    # raise "Duration time unit #@duration_unit is uncorrect" unless @duration_unit == :min
   end
 
   def to_s
-    "#@name :(#@date ; #{@genres.join(',')}) - #@duration #@duration_unit country:#{@country.join(',')} \n-----------"
+    "#@name :(#@date ; #{@genres.join(',')}) - #@duration min country:#{@country.join(',')} \n-----------"
   end
 
   def has_genre?(genre)
@@ -40,13 +40,8 @@ class Movie
   end
 
   def filtered_by?(field, value)
-    case field
     
-    when :actors, :country, :genres 
-      self.send(field).any? { |elem| value.match(elem) } 
-    else
-      value === self.send(field)
-    end
+    Array(self.send(field)).grep(value).any?
 
   end
 

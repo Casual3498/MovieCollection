@@ -55,6 +55,3 @@ class MovieCollection
 
 
 end
-
-
-
