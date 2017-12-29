@@ -25,9 +25,7 @@ class MovieCollection
 
   def filter(field_value )
 
-    @films_array.select { |movie| field_value.all? { |key, value| movie.send(key).to_s.include?(value) } } 
-
-    # @films_array.reject { |movie| field_value.find { |key, value| !movie.send(key).to_s.include?(value) } } 
+    @films_array.select { |movie| field_value.all? { |key, value| movie.filtered_by?(key, value) } } 
 
   end
 

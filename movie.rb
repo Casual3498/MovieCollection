@@ -41,4 +41,26 @@ class Movie
     @date[0..3].to_i
   end
 
+  def filtered_by?(field, value)
+    
+    case value.class.inspect
+    when 'Range'
+      value.include?(self.send(field))
+
+    when 'Regexp'
+      case field
+      when :actors, :country, :genres 
+        self.send(field).split(',').any? { |elem| value.match(elem) }
+      else
+        value.match(self.send(field))
+      end
+    else
+
+      send(field).to_s.include?(value)
+    end
+
+  end
+
+
+
 end
