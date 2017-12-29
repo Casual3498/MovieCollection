@@ -42,8 +42,20 @@ class Movie
   end
 
   def filtered_by?(field, value)
-
-    value === self.send(field).to_s
+    case field
+    
+    when :actors, :country, :genres 
+      self.send(field).split(',').any? { |elem| value.match(elem) }
+    
+    when :month, :year, :duration  
+      if (String === value ) 
+        value.to_i === self.send(field)
+      else
+        value === self.send(field)
+      end
+    else
+      value === self.send(field)
+    end
 
   end
 

@@ -31,23 +31,28 @@ movies =  MovieCollection.new('movies.txt')
 # puts "5 USA's films"
 # puts movies.filter(country: 'USA').first(5)
 # puts "\n\n"
-puts "5 Drama USA's films of 2015"
+puts "5 Comedy USA's films of 2015"
 puts movies.filter(country: 'USA', genres: 'Comedy', year: '2015').first(5)
 puts "\n\n"
 
 
-puts "5 Drama USA's films of 1990..2015"
+puts "5 Comedy USA's films of 1990..2015"
 puts movies.filter(country: 'USA', genres: 'Comedy', year: 1990..2015).first(5)
 puts "\n\n"
 
-puts "5 films with name consist 'Up' "
-puts movies.filter(name: /Up/).first(5)
+puts "actor - C.*Sheen"
+puts movies.filter(actors: /C.*Sheen/)
 puts "\n\n"
 
 
-puts "films with actor /Hoffma/"
-puts movies.filter(actors: /Hoffma/)
-puts "\n\n"
+# puts "5 films with name consist 'Up' "
+# puts movies.filter(name: /Up/).first(5)
+# puts "\n\n"
+
+
+# puts "films with actor /Hoffma/"
+# puts movies.filter(actors: /Hoffma/)
+# puts "\n\n"
 
 
 
