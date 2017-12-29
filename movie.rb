@@ -42,25 +42,10 @@ class Movie
   end
 
   def filtered_by?(field, value)
-    
-    case value
-    when Range
-      value.include?(self.send(field))
 
-    when Regexp
-      case field
-      when :actors, :country, :genres 
-        self.send(field).split(',').any? { |elem| value.match(elem) }
-      else
-        value.match(self.send(field))
-      end
-    else
-
-      send(field).to_s.include?(value)
-    end
+    value === self.send(field).to_s
 
   end
-
 
 
 end
