@@ -5,6 +5,11 @@ class MovieCollection
 
   KEYS_ARRAY = %i[href name year country date genres duration rank director actors]
 
+  def initialize (filename = 'movies.txt')
+    @films_array = CSV.read(filename, col_sep: '|', headers: KEYS_ARRAY).map { |string| Movie.new(self, string.to_h) }
+    @genres = @films_array.map(&:genres).flatten.uniq
+  end
+
   def to_s
     @films_array.join("\n")
   end
@@ -33,21 +38,6 @@ class MovieCollection
 
   def has_genre?(genre)
     @genres.include?(genre)
-  end
-
-  private
-
-
-  def initialize (filename = 'movies.txt')
-    @films_array = CSV.read(filename, col_sep: '|', headers: KEYS_ARRAY).map { |string| Movie.new(self, string.to_h) }
-    fill_genres
-  end
-
-  def fill_genres
-    @genres = []
-    @films_array.each do |film|
-      film.genres.each { |genre| @genres += Array(genre) unless @genres.include?(genre) } 
-    end
   end
 
 
