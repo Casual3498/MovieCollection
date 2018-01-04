@@ -25,17 +25,17 @@ RSpec.describe Netflix do
       
       expect { netflix.show }.to output.to_stdout 
 
-      expect { netflix.show(period: :classic, director: 'Akira Kurosawa', year: 1957) }.to  output(/\ANow showing:(.*)— классический фильм, режиссёр(.*)\(ещё 5 его фильм\(ов\) в списке\) #{Time.now.strftime('%H:%M:%S')} — #{(Time.now + 110*60).strftime('%H:%M:%S') }/ ).to_stdout
+      expect { netflix.show(period: :classic, director: 'Akira Kurosawa', year: 1957) }.to  output(/\ANow showing:(.*)— классический фильм, режиссёр(.*)\(ещё 5 его фильм\(ов\) в списке\) #{Time.now.strftime('%H:%M')} — #{(Time.now + 110*60).strftime('%H:%M') }/ ).to_stdout
     end
 
     it 'Netflix charge money' do
       netflix.pay(11)
-      expect { netflix.show(period: :anchient) }.to change(netflix, :money).by(-1)
+      expect { netflix.show(period: :ancient) }.to change(netflix, :money).by(-1)
       expect { netflix.show(period: :classic) }.to change(netflix, :money).by(-1.5)
       expect { netflix.show(period: :modern) }.to change(netflix, :money).by(-3)
       expect { netflix.show(period: :new) }.to change(netflix, :money).by(-5)
       # now we have only 0.5 money
-      expect { netflix.show }.to raise_error(RuntimeError, "Not enough money to show film!")
+      expect { netflix.show(period: :new) }.to raise_error(RuntimeError, "You have only 0.5 amount of money. The film's cost is 5 money.")
     end
 
   end

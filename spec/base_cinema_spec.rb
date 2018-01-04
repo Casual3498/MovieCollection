@@ -9,8 +9,7 @@ RSpec.describe BaseCinema do
   describe '#show' do
     it 'BaseCinema can output "Now showing:"' do
             
-      expect { cinema.show }.to  output.to_stdout 
-      expect { cinema.show }.to  output(/Now showing:/).to_stdout
+      expect { cinema.show }.to  raise_error(NotImplementedError,'BaseCinema#show not implemented')
 
     end
   end
