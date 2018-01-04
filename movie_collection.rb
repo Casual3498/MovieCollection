@@ -1,12 +1,24 @@
 require 'csv'
-require './movie.rb'
+
+require './ancient_movie.rb'
+require './classic_movie.rb'
+require './modern_movie.rb'
+require './new_movie.rb'
 
 class MovieCollection
 
   KEYS_ARRAY = %i[href name year country date genres duration rank director actors]
 
   def initialize (filename = 'movies.txt')
-    @films_array = CSV.read(filename, col_sep: '|', headers: KEYS_ARRAY).map { |string| Movie.new(self, string.to_h) }
+    @films_array = CSV.read(filename, col_sep: '|', headers: KEYS_ARRAY).map do |string| 
+      case (string.to_h[:year].to_i)
+      when 1900..1945 then AncientMovie.new(self, string.to_h)
+      when 1946..1968 then ClassicMovie.new(self, string.to_h)
+      when 1969..2000 then ModernMovie.new(self, string.to_h)
+      when 2001..Date.today.year then NewMovie.new(self, string.to_h)
+      else Movie.new(self, string.to_h) 
+      end
+    end
     @genres = @films_array.map(&:genres).flatten.uniq
   end
 

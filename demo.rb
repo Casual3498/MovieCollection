@@ -76,3 +76,14 @@ puts movies.all.first.has_genre?('Tragedy')
 rescue RuntimeError => detail
   puts "RuntimeError is occured: #{detail}" 
 end
+
+
+
+puts "------------------------------------------------------"
+puts movies.filter( period: :modern)
+puts "\n\n"
+
+
+puts "10 Comedies or Drama France"
+puts movies.filter(genres: 'Drama', genres: 'Comedy', country: 'France').first(5)
+puts "\n\n"

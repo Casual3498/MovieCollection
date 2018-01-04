@@ -1,21 +1,20 @@
 require './movie.rb'
+require 'date'
 class Movie
-  attr_reader :href, :name, :year, :country, :date, :genres, :duration, :rank, :director, :actors
-
+  attr_accessor :href, :name, :year, :country, :date, :genres, :duration, :rank, :director, :actors
+  
   def initialize (creator, href:, name:, year:, country:, date:, genres:, duration:, rank:, director:, actors:)
     @creator = creator
     @href = href
     @name = name
-    @year = year
+    @year = year.to_i
     @country = country.split(',')
     @date = date
     @genres = genres.split(',')
     @duration = duration.split(" ")[0].to_i
-    # @duration_unit = :"#{duration.split(" ")[1]}"
-    @rank = rank
+    @rank = rank.to_f
     @director = director
     @actors = actors.split(',')
-    # raise "Duration time unit #@duration_unit is uncorrect" unless @duration_unit == :min
   end
 
   def to_s
@@ -35,14 +34,23 @@ class Movie
     @date[5..6].to_i 
   end
 
-  def year
-    @date[0..3].to_i
+  def filtered_by?(field, value)
+    Array(self.send(field)).grep(value).any?
   end
 
-  def filtered_by?(field, value)
-    
-    Array(self.send(field)).grep(value).any?
+  def period     
+    case self
+    when AncientMovie  then :ancient
+    when ClassicMovie  then :classic
+    when ModernMovie   then :modern
+    when NewMovie      then :new
+    else :out_of_range
+    end
+  end
 
+  def director_films_count(director)
+    return 0 unless @creator
+    @creator.stats('director')[director]
   end
 
 

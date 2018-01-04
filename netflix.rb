@@ -1,9 +1,12 @@
 require './base_cinema.rb'
 class Netflix < BaseCinema
   attr_reader :money
+
+  FILMS_COSTS = { ancient: 1, classic: 1.5, modern: 3, new: 5 }
+
   def initialize(filename = 'movies.txt')
+    super(filename)
     @money = 0.0
-    super
   end
 
   def pay(amount)
@@ -12,44 +15,24 @@ class Netflix < BaseCinema
 
   def show(filter_value = {})
     films = select_films(filter_value)
-    film = films[rand(films.length)]
+    film = random_film_by_rank(films)
     cost = film_cost(film)
-    raise "Not enough money to show film!" if @money < cost
-
+    raise "You have only #@money amount of money. The film's cost is #{film_cost(film)} money." if @money < cost
     @money-=cost
-
-    puts "Now showing: #{film} #{Time.now.strftime('%H:%M:%S')} — #{(Time.now + 110*60).strftime('%H:%M:%S')}"
+    showing_film(film, Time.now) 
   end
 
   def how_much?(film_name)
-    film = @movies.all.select { |movie| movie.name == film_name }
-    if film.length == 1
-      film_cost(film[0])
-    else
-      'film not found or found more than 1'
-    end
-    
+    film = @movies.all.find { |movie| movie.name == film_name }
+    return 'film not found' unless film
+    film_cost(film)
   end  
 
   protected
 
-  def select_films(filter_value)
-    @movies.filter(filter_value)
-  end
-
   def film_cost(film)
-    case film.period
-    when :anchient then 1
-    when :classic then 1.5
-    when :modern then 3
-    when :new then 5
-    else 10**10 end
+    FILMS_COSTS[:"#{film.period}"]
   end
 
 
 end
-
-      # netflix = Netflix.new
-      
-      
-      # puts netflix.show(genres: 'Comedy', period: :modern)
