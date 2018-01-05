@@ -26,7 +26,7 @@ RSpec.describe Netflix do
       end
     end
 
-    describe 'Netflix charge money' do
+    describe 'charge money' do
       before { netflix.pay(5.5) }
 
       context 'when ancient movie' do
@@ -49,15 +49,22 @@ RSpec.describe Netflix do
         it { expect { show }.to change(netflix, :money).by(-5) }
       end
 
-      context 'when not enought money' do
-        let(:filters) { { period: :new } }
-        it do 
-          expect { show }.to change(netflix, :money).by(-5)
-          expect { netflix.show(period: :new) }.to raise_error(RuntimeError, "You have only 0.5 amount of money. The film's cost is 5 money.") 
-        end
-      end
-
+      # context 'when not enought money' do
+      #   let(:filters) { { period: :new } }
+      #   it do 
+      #     expect { show }.to change(netflix, :money).by(-5)
+      #     expect { netflix.show(period: :new) }.to raise_error(RuntimeError, "You have only 0.5 amount of money. The film's cost is 5 money.") 
+      #   end
+      # end
     end
+
+    describe 'rise exception when not enought money' do
+      before { netflix.pay(0.5) }
+      let(:filters) { { period: :new } }
+
+      it { expect { netflix.show(period: :new) }.to raise_error(RuntimeError, "You have only 0.5 amount of money. The film's cost is 5 money.") }
+    end
+
 
   end
 
