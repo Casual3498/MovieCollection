@@ -38,20 +38,9 @@ class Movie
     Array(self.send(field)).grep(value).any?
   end
 
-  def period     
-    case self
-    when AncientMovie  then :ancient
-    when ClassicMovie  then :classic
-    when ModernMovie   then :modern
-    when NewMovie      then :new
-    else :out_of_range
-    end
+  def period
+    class_name = self.class.to_s.downcase   
+    :"#{class_name[0,class_name.length-'Movie'.length]}"
   end
-
-  def director_films_count(director)
-    return 0 unless @creator
-    @creator.stats('director')[director]
-  end
-
 
 end

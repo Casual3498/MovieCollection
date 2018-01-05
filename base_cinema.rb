@@ -25,13 +25,7 @@ class BaseCinema
   end
 
   def random_film_by_rank(films)
-    films.map do |film|
-      if film.rank <= 8.1 
-        film
-      else
-        Array(film)*((film.rank-8)*10)
-      end
-    end.flatten.sample
+    films.sort_by { |film| rand * film.rank }.last
   end
 
 end

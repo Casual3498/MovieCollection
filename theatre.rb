@@ -1,24 +1,19 @@
 require './base_cinema.rb'
 require 'time'
 class Theatre < BaseCinema
+  SCHEDULE = { morning: '09:00'..'11:59', daytime: '12:00'..'16:59', evening: '17:00'..'23:59', closed: '00:00'..'08:59'}
 
-  def show(time)
-    show_time = Time.strptime(time,'%H:%M')
-    return "Theatre is closed now. It will be opened at 7:00." if show_time >= Time.strptime('0:00','%H:%M') && show_time < Time.strptime('7:00','%H:%M')
-
-    case 
-    when show_time >= Time.strptime('7:00','%H:%M') && show_time < Time.strptime('12:00','%H:%M')
-      filter_values = [{ period: :ancient }]
-    when show_time >= Time.strptime('12:00','%H:%M') && show_time < Time.strptime('17:00','%H:%M')
-      filter_values = [{ genres: 'Comedy'}, {genres: 'Adventure'}]
-    when show_time >= Time.strptime('17:00','%H:%M') && show_time <= Time.strptime('23:59','%H:%M')
-      filter_values = [{ genres: 'Drama'}, {genres: 'Horror'}]
-    end 
-    films = []
-    filter_values.each do |filter_value|
-      films += select_films(filter_value)
+  def show(str_time)
+    show_time = Time.strptime(str_time,'%H:%M')
+    
+    case time_period(show_time)
+    when :morning then filter_values = [{ period: :ancient }]
+    when :daytime then filter_values = [{ genres: 'Comedy'}, {genres: 'Adventure'}]
+    when :evening then filter_values = [{ genres: 'Drama'}, {genres: 'Horror'}]
+    else return "Theatre is closed now. It will be opened at 7:00."
     end
-    films.uniq!
+
+    films = filter_values.map { |filter_value| select_films(filter_value) }.flatten.uniq
 
     film = random_film_by_rank(films)
     showing_film(film, show_time)    
@@ -27,19 +22,33 @@ class Theatre < BaseCinema
   def when?(film_name) 
     film = @movies.all.find { |movie| movie.name == film_name }
     return 'film not found' unless film
-    film_time(film).join(',')
- 
+    film_time(film) 
   end
 
   protected
 
   def film_time(film)
     ret = []
-    ret << '9:00'  if film.filtered_by?(:period, :ancient)
-    ret << '14:00' if film.filtered_by?(:genres, 'Comedy') || film.filtered_by?(:genres, 'Adventure')
-    ret << '18:00' if film.filtered_by?(:genres, 'Drama, Horror') || film.filtered_by?(:genres, 'Horror')
-    ret << 'This movie is not shown in this theatre.' if ret.empty? 
-    return ret     
+    ret << SCHEDULE[:morning] if film.filtered_by?(:period, :ancient)
+    ret << SCHEDULE[:daytime] if film.filtered_by?(:genres, 'Comedy') || film.filtered_by?(:genres, 'Adventure')
+    ret << SCHEDULE[:evening] if film.filtered_by?(:genres, 'Drama') || film.filtered_by?(:genres, 'Horror')
+    return 'This movie is not shown in this theatre.' if ret.empty?  
+    #union ranges
+    ret.inject do |res,elem| 
+      if Time.strptime(res.last,'%H:%M')<(Time.strptime(elem.first,'%H:%M')-60) 
+        [res,elem] 
+      else 
+        (res.first..elem.last) 
+      end 
+    end  
+  end
+
+  def time_period(show_time)
+
+    SCHEDULE.find do |key, value| 
+      (Time.strptime(value.first,'%H:%M')..Time.strptime(value.last,'%H:%M')).cover?(show_time)
+    end[0]    
+
   end
 
 end

@@ -1,54 +1,89 @@
 require './netflix.rb'
-# require 'pp'
 
 RSpec.describe Netflix do
-  let!(:netflix) { Netflix.new }
+  let(:netflix) { Netflix.new }
 
-
-  describe '#pay' do
-    it { expect(netflix).to respond_to(:pay) }
-
-    it 'Netflix can receive payments' do
-      expect { netflix.pay(25) }.to change(netflix, :money).by(25)
-
+  describe '#money' do
+    subject { netflix.money }
+    it { is_expected.to eq 0 }
+    context 'after paying' do
+      before { netflix.pay(25) }
+      it { is_expected.to eq 25 }
     end
-
   end
 
 
   describe '#show' do
+    subject(:show) { netflix.show(filters) }
 
-    it { expect(netflix).to respond_to(:show) }
-    
-    it 'Netflix can show film with filters' do
-      netflix.pay(10) # for prevent exception
-      
-      expect { netflix.show }.to output.to_stdout 
-
-      expect { netflix.show(period: :classic, director: 'Akira Kurosawa', year: 1957) }.to  output(/\ANow showing:(.*)— классический фильм, режиссёр(.*)\(ещё 5 его фильм\(ов\) в списке\) #{Time.now.strftime('%H:%M')} — #{(Time.now + 110*60).strftime('%H:%M') }/ ).to_stdout
+    describe 'Netflix can show film with filters' do
+      before { netflix.pay(10) }
+      context 'when period, director and year film' do
+        let(:filters) { { period: :classic, director: 'Akira Kurosawa', year: 1957 } }
+        it do
+         expect { show }.to output(/\ANow showing:(.*)— классический фильм, режиссёр(.*)\(ещё 5 его фильм\(ов\) в списке\) #{Time.now.strftime('%H:%M')} — #{(Time.now + 110*60).strftime('%H:%M') }/ ).to_stdout
+        end
+      end
     end
 
-    it 'Netflix charge money' do
-      netflix.pay(11)
-      expect { netflix.show(period: :ancient) }.to change(netflix, :money).by(-1)
-      expect { netflix.show(period: :classic) }.to change(netflix, :money).by(-1.5)
-      expect { netflix.show(period: :modern) }.to change(netflix, :money).by(-3)
-      expect { netflix.show(period: :new) }.to change(netflix, :money).by(-5)
-      # now we have only 0.5 money
-      expect { netflix.show(period: :new) }.to raise_error(RuntimeError, "You have only 0.5 amount of money. The film's cost is 5 money.")
+    describe 'Netflix charge money' do
+      before { netflix.pay(5.5) }
+
+      context 'when ancient movie' do
+        let(:filters) { { period: :ancient } }
+        it { expect { show }.to change(netflix, :money).by(-1) }
+      end
+
+      context 'when classic movie' do
+        let(:filters) { { period: :classic } }
+        it { expect { show }.to change(netflix, :money).by(-1.5) }
+      end
+
+      context 'when modern movie' do
+        let(:filters) { { period: :modern } }
+        it { expect { show }.to change(netflix, :money).by(-3) }
+      end
+
+      context 'when new movie' do
+        let(:filters) { { period: :new } }
+        it { expect { show }.to change(netflix, :money).by(-5) }
+      end
+
+      context 'when not enought money' do
+        let(:filters) { { period: :new } }
+        it do 
+          expect { show }.to change(netflix, :money).by(-5)
+          expect { netflix.show(period: :new) }.to raise_error(RuntimeError, "You have only 0.5 amount of money. The film's cost is 5 money.") 
+        end
+      end
+
     end
 
   end
 
   describe '#how_much?' do
+    subject(:how_much?) { netflix.how_much?(film_name) }
 
-     it { expect(netflix).to respond_to(:how_much?) }
+    context 'when ancient movie' do
+      let(:film_name) { 'Modern Times' }  
+      it { expect(how_much?).to eq(1) }
+    end  
 
-     it { expect(netflix.how_much?('The Terminator')).to eq(3) } # modern movie
+    context 'when classic movie' do
+      let(:film_name) { 'Paths of Glory' }  
+      it { expect(how_much?).to eq(1.5) }
+    end  
+
+    context 'when modern movie' do
+      let(:film_name) { 'The Terminator' }  
+      it { expect(how_much?).to eq(3) }
+    end 
+
+    context 'when new movie' do
+      let(:film_name) { 'WALL·E' }  
+      it { expect(how_much?).to eq(5) }
+    end  
 
   end 
-
-
-
 
 end

@@ -1,31 +1,46 @@
 require './theatre.rb'
 
 RSpec.describe Theatre do
-  let!(:theatre) { Theatre.new }
+  let(:theatre) { Theatre.new }
 
   describe '#show' do
-    it 'Theatre can show film at time' do
-      
-      #expect { theatre.show('2:00') }.to output.to_stdout 
-      expect(theatre.show('2:00')).to eq("Theatre is closed now. It will be opened at 7:00.")
-      
-      expect { theatre.show('9:00') }.to  output(/\ANow showing:(.*)— старый фильм \((.*) год\)/).to_stdout 
+    subject(:show) { theatre.show(time) }
 
-      #expect { theatre.show('14:00') }.to  output(/\ANow showing:(.*)— старый фильм \((.*) год\)/).to_stdout 
+    describe 'is closed at night' do
+      let(:time) { '2:00' }
+      it { expect(show).to eq("Theatre is closed now. It will be opened at 7:00.") }
     end
+
+    describe 'anchient films at morning' do
+      let(:time) { '9:00' }
+      it { expect { show }.to output(/\ANow showing:(.*)— старый фильм \((.*) год\)/).to_stdout }
+    end
+
+    
+
   end
 
   describe "#when?" do
+    subject(:when?) { theatre.when?(film_name) }
 
-    it { expect(theatre).to respond_to(:when?) }
+    describe 'only anchient films or comedy, adventure, drama and horror' do
+      let(:film_name) { 'The Terminator' }
+      it { expect(when?).to eq('This movie is not shown in this theatre.') }  
+    end
 
-    it 'Theatre tell when film is started' do
-      expect(theatre.when?('The Terminator')).to eq('This movie is not shown in this theatre.')
-   
-      expect(theatre.when?('Some Like It Hot')).to eq('14:00')
+    describe 'comedy will be shown in daytime (12:00 - 16:59)' do
+      let(:film_name) { 'Some Like It Hot' }
+      it { expect(when?).to eq('12:00'..'16:59') }  
+    end
 
-      expect(theatre.when?('Alien')).to eq('18:00')
+    describe 'horror will be shown in evening (17:00 - 23:59)' do
+      let(:film_name) { 'Alien' }
+      it { expect(when?).to eq('17:00'..'23:59') }  
+    end
 
+    describe 'anchient comedy and drama will be shown all day' do
+      let(:film_name) { 'Modern Times' }
+      it { expect(when?).to eq('09:00'..'23:59') }  
     end
 
   end
