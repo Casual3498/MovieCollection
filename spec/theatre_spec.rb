@@ -8,7 +8,7 @@ RSpec.describe Theatre do
 
     describe 'is closed at night' do
       let(:time) { '2:00' }
-      it { expect(show).to eq("Theatre is closed now. It will be opened at 7:00.") }
+      it { expect(show).to eq("Theatre is closed now. It will be opened at 09:00.") }
     end
 
     describe 'anchient films at morning' do
@@ -62,7 +62,7 @@ RSpec.describe Theatre do
   describe 'filters at :evening' do
     it do
       expect(theatre).to receive(:select_films).with({ genres: 'Drama' }).and_call_original 
-      #expect(theatre).to receive(:select_films).with( {genres: 'Horror' }).and_call_original 
+      expect(theatre).to receive(:select_films).with( {genres: 'Horror' }).and_call_original 
       theatre.show('19:00')
     end
   end
