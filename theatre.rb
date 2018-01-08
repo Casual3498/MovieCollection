@@ -1,11 +1,10 @@
 require './base_cinema.rb'
 require 'time'
 class Theatre < BaseCinema
-  SCHEDULE = { '09:00'..'11:59' => { period: :ancient },
+  SCHEDULE = { '09:00'..'11:59' => { period: :ancient, genres: 'Comedy' },
                '12:00'..'16:59' => { genres: %w[Comedy Adventure] },
                '17:00'..'23:59' => { genres: %w[Drama Horror] } 
              }
-  # SCHEDULE_FILTERS = { morning: { period: :ancient }, daytime: { genres: %w[Comedy Adventure] }, evening: { genres: %w[Drama Horror] } }
 
   def show(str_time)
     show_time = Time.strptime(str_time,'%H:%M')
@@ -28,10 +27,10 @@ class Theatre < BaseCinema
 
   def film_time(film)
      
-    ret = SCHEDULE.select do |key, value| 
-      film.filtered_by?(value.first[0],value.first[1])
+    ret = SCHEDULE.select do |key, field_value|
+      field_value.all? { |key,value| film.filtered_by?(key,value) }
     end.keys
- 
+
     return 'This movie is not shown in this theatre.' if ret.empty? 
     
     #union ranges

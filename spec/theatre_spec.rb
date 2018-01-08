@@ -47,7 +47,7 @@ RSpec.describe Theatre do
 
   describe 'filters at :morning' do
     it do
-      expect(theatre).to receive(:select_films).with(period: :ancient).and_call_original
+      expect(theatre).to receive(:select_films).with(period: :ancient, genres: 'Comedy').and_call_original
       theatre.show('09:00')
     end
   end
