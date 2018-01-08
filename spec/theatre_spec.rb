@@ -47,24 +47,25 @@ RSpec.describe Theatre do
 
   describe 'filters at :morning' do
     it do
-      expect(theatre).to receive(:select_films).with({ period: :ancient }).and_call_original
+      expect(theatre).to receive(:select_films).with(period: :ancient).and_call_original
       theatre.show('09:00')
     end
   end
 
   describe 'filters at :daytime' do
     it do
-      #expect(theatre).to receive(:select_films).with({ genres: %w[Adventure Comedy] }).and_call_original
-      expect(theatre).to receive(:select_films).with({ genres: %w[Comedy Adventure] }).and_call_original
+      expect(theatre).to receive(:select_films).with(genres: contain_exactly('Adventure', 'Comedy')).and_call_original
       theatre.show('14:00')
     end
   end
 
   describe 'filters at :evening' do
     it do
-      expect(theatre).to receive(:select_films).with({ genres: %w[Drama Horror] }).and_call_original
+      allow(theatre).to receive(:select_films).with(genres: match_array(%w[Drama Horror]) ).and_call_original
       theatre.show('19:00')
+      expect(theatre).to have_received(:select_films).with(genres: match_array(%w[Drama Horror]) )
     end
   end
+
 
 end
