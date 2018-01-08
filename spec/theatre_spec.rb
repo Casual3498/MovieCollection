@@ -62,7 +62,7 @@ RSpec.describe Theatre do
   describe 'filters at :evening' do
     it do
       expect(theatre).to receive(:select_films).with({ genres: 'Drama' }).and_call_original 
-      expect(theatre).to receive(:select_films).with( {genres: 'Horror' }).and_call_original 
+      #expect(theatre).to receive(:select_films).with( {genres: 'Horror' }).and_call_original 
       theatre.show('19:00')
     end
   end
