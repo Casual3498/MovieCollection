@@ -14,9 +14,7 @@ RSpec.describe Theatre do
     describe 'anchient films at morning' do
       let(:time) { '9:00' }
       it { expect { show }.to output(/\ANow showing:(.*)— старый фильм \((.*) год\)/).to_stdout }
-    end
-
-    
+    end 
 
   end
 
@@ -45,4 +43,36 @@ RSpec.describe Theatre do
 
   end
 
+
+
+  describe 'filters at :morning' do
+    it do
+      expect(theatre).to receive(:select_films).with({ period: :ancient }).and_call_original
+      theatre.show('09:00')
+    end
+  end
+
+  describe 'filters at :daytime' do
+    it do
+      expect(theatre).to receive(:select_films).with(be_a_filter_of_array2([{ genres: 'Adventure' },{genres: 'Comedy' }])).and_call_original.twice 
+      theatre.show('14:00')
+    end
+  end
+
+  describe 'filters at :evening' do
+    it do
+      expect(theatre).to receive(:select_films).with({ genres: 'Drama' }).and_call_original 
+      expect(theatre).to receive(:select_films).with( {genres: 'Horror' }).and_call_original 
+      theatre.show('19:00')
+    end
+  end
+
+end
+
+
+require 'rspec/expectations'
+RSpec::Matchers.define :be_a_filter_of_array2 do |expected|
+  match do |actual|
+    (actual == expected[0]) || (actual == expected[1])
+  end
 end

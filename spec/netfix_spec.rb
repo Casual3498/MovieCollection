@@ -27,7 +27,7 @@ RSpec.describe Netflix do
     end
 
     describe 'charge money' do
-      before { netflix.pay(5.5) }
+      before{ netflix.pay(5.5) }
 
       context 'when ancient movie' do
         let(:filters) { { period: :ancient } }

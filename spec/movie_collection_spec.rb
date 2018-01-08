@@ -28,11 +28,10 @@ RSpec.describe MovieCollection do
 
     context "when filter_value is country: 'USA', genres: 'Comedy', year: 1960..2001, actors: /Hoffma/ " do
       let(:filter_value) { {  country: 'USA', genres: 'Comedy', year: 1960..2001, actors: /Hoffma/ } }
-      it { expect(filter.size).to eq(1) } 
+      # it { expect(filter.size).to eq(1) } 
+      it { expect(filter).to all have_attributes(country: include('USA'), genres: include('Comedy') , year: be_between(1960,2001), actors: include(/Hoffma/) ) }
     end
     
   end
-
-
 
 end
