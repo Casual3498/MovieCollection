@@ -85,5 +85,5 @@ puts "\n\n"
 
 
 puts "10 Comedies or Drama France"
-puts movies.filter(genres: 'Drama', genres: 'Comedy', country: 'France').first(5)
+puts movies.filter( genres: %w[Comedy Drama], country: 'France').first(5)
 puts "\n\n"

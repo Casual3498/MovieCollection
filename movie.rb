@@ -35,6 +35,7 @@ class Movie
   end
 
   def filtered_by?(field, value)
+    value = /^(#{value.join('|')})$/ if value.class == Array
     Array(self.send(field)).grep(value).any?
   end
 

@@ -8,7 +8,7 @@ RSpec.describe Theatre do
 
     describe 'is closed at night' do
       let(:time) { '2:00' }
-      it { expect(show).to eq("Theatre is closed now. It will be opened at 09:00.") }
+      it { expect { show }.to raise_error(RuntimeError, "Theatre is closed now. It will be opened at 09:00.") }
     end
 
     describe 'anchient films at morning' do
@@ -54,25 +54,17 @@ RSpec.describe Theatre do
 
   describe 'filters at :daytime' do
     it do
-      expect(theatre).to receive(:select_films).with(be_a_filter_of_array2([{ genres: 'Adventure' },{genres: 'Comedy' }])).and_call_original.twice 
+      #expect(theatre).to receive(:select_films).with({ genres: %w[Adventure Comedy] }).and_call_original
+      expect(theatre).to receive(:select_films).with({ genres: %w[Comedy Adventure] }).and_call_original
       theatre.show('14:00')
     end
   end
 
   describe 'filters at :evening' do
     it do
-      expect(theatre).to receive(:select_films).with({ genres: 'Drama' }).and_call_original 
-      expect(theatre).to receive(:select_films).with( {genres: 'Horror' }).and_call_original 
+      expect(theatre).to receive(:select_films).with({ genres: %w[Drama Horror] }).and_call_original
       theatre.show('19:00')
     end
   end
 
-end
-
-
-require 'rspec/expectations'
-RSpec::Matchers.define :be_a_filter_of_array2 do |expected|
-  match do |actual|
-    (actual == expected[0]) || (actual == expected[1])
-  end
 end

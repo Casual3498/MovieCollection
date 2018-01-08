@@ -1,19 +1,18 @@
 require './base_cinema.rb'
 require 'time'
 class Theatre < BaseCinema
-  SCHEDULE = { morning: '09:00'..'11:59', daytime: '12:00'..'16:59', evening: '17:00'..'23:59', closed: '00:00'..'08:59'}
-  SCHEDULE_FILTERS = { morning:  [{ period: :ancient }], daytime:  [{ genres: 'Comedy'}, {genres: 'Adventure'}], evening: [{ genres: 'Drama'}, {genres: 'Horror'}], closed: "Theatre is closed now. It will be opened at #{SCHEDULE[:morning].first}." }
+  SCHEDULE = { '09:00'..'11:59' => { period: :ancient },
+               '12:00'..'16:59' => { genres: %w[Comedy Adventure] },
+               '17:00'..'23:59' => { genres: %w[Drama Horror] } 
+             }
+  # SCHEDULE_FILTERS = { morning: { period: :ancient }, daytime: { genres: %w[Comedy Adventure] }, evening: { genres: %w[Drama Horror] } }
 
   def show(str_time)
     show_time = Time.strptime(str_time,'%H:%M')
-    
+    period_settings = time_period(show_time)
+    raise "Theatre is closed now. It will be opened at #{SCHEDULE.first.first.first}." unless period_settings
 
-    day_period = time_period(show_time)
-    return SCHEDULE_FILTERS[day_period] if day_period == :closed
-
-    filter_values = SCHEDULE_FILTERS[day_period]
-
-    films = filter_values.map { |filter_value| select_films(filter_value) }.flatten.uniq
+    films = select_films(period_settings[1])
 
     film = random_film_by_rank(films)
     showing_film(film, show_time)    
@@ -29,9 +28,10 @@ class Theatre < BaseCinema
 
   def film_time(film)
      
-    ret =[:morning, :daytime, :evening].map do |day_period| 
-      SCHEDULE[day_period] if film_filtered_by_single_filters?(film, SCHEDULE_FILTERS[day_period])
-    end.compact
+    ret = SCHEDULE.select do |key, value| 
+      film.filtered_by?(value.first[0],value.first[1])
+    end.keys
+ 
     return 'This movie is not shown in this theatre.' if ret.empty? 
     
     #union ranges
@@ -45,15 +45,10 @@ class Theatre < BaseCinema
   end
 
   def time_period(show_time)
-
     SCHEDULE.find do |key, value| 
-      (Time.strptime(value.first,'%H:%M')..Time.strptime(value.last,'%H:%M')).cover?(show_time)
-    end[0]    
-
+      (Time.strptime(key.first,'%H:%M')..Time.strptime(key.last,'%H:%M')).cover?(show_time)
+    end
   end
 
-  def film_filtered_by_single_filters?(film, filters_array)
-    filters_array.find { |filter| film.filtered_by?(filter.first[0], filter.first[1]) }
-  end
 
 end
