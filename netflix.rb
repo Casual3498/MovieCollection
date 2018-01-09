@@ -31,7 +31,7 @@ class Netflix < BaseCinema
   protected
 
   def film_cost(film)
-    FILMS_COSTS[:"#{film.period}"]
+    FILMS_COSTS[film.period]
   end
 
 

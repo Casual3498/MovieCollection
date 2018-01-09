@@ -40,8 +40,7 @@ class Movie
   end
 
   def period
-    class_name = self.class.to_s.downcase   
-    :"#{class_name[0,class_name.length-'Movie'.length]}"
+    self.class.to_s.downcase.match(/(.*)movie$/)[1].to_sym 
   end
 
 end

@@ -8,22 +8,24 @@ class Theatre < BaseCinema
 
   def show(str_time)
     show_time = Time.strptime(str_time,'%H:%M')
-    period_settings = time_period(show_time)
-    raise "Theatre is closed now. It will be opened at #{SCHEDULE.first.first.first}." unless period_settings
+    period, filters = time_period(show_time)
+    raise "Theatre is closed now. It will be opened at #{SCHEDULE.first.first.first}." unless period
 
-    films = select_films(period_settings[1])
-
+    films = select_films(filters)
     film = random_film_by_rank(films)
     showing_film(film, show_time)    
   end
 
+
   def when?(film_name) 
-    film = @movies.all.find { |movie| movie.name == film_name }
+    film = @movies.filter(name: film_name).first
     return 'film not found' unless film
     film_time(film) 
   end
 
+
   protected
+
 
   def film_time(film)
      
