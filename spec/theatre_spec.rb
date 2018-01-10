@@ -67,5 +67,32 @@ RSpec.describe Theatre do
     end
   end
 
+  describe '#buy_ticket' do
+    subject(:buy_ticket) { theatre.buy_ticket(time) }
+
+    context 'you can buy ticket only on SCHEDULE time' do
+      let(:time) { '2:00' }
+      it { expect { buy_ticket }.to raise_error(RuntimeError , "You can't to buy ticket on this time. Theatre will be opened 09:00..23:59.") }
+
+    end
+
+    context 'you can buy ticket on morning film' do
+      let(:time) { '9:00' }
+      it { expect { buy_ticket }.to output(/\AYou bought ticket on (.*)\.$/).to_stdout }
+      it { expect { buy_ticket }.to change(theatre, :cash).by(3) }
+    end
+
+    context 'you can buy ticket on daytime film' do
+      let(:time) { '14:00' }
+      it { expect { buy_ticket }.to output(/\AYou bought ticket on (.*)\.$/).to_stdout }
+      it { expect { buy_ticket }.to change(theatre, :cash).by(5) }
+    end
+
+    context 'you can buy ticket on evening film' do
+      let(:time) { '19:00' }
+      it { expect { buy_ticket }.to output(/\AYou bought ticket on (.*)\.$/).to_stdout }
+      it { expect { buy_ticket }.to change(theatre, :cash).by(10) }
+    end    
+  end 
 
 end

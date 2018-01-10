@@ -3,15 +3,6 @@ require './netflix.rb'
 RSpec.describe Netflix do
   let(:netflix) { Netflix.new }
 
-  describe '#money' do
-    subject { netflix.money }
-    it { is_expected.to eq 0 }
-    context 'after paying' do
-      before { netflix.pay(25) }
-      it { is_expected.to eq 25 }
-    end
-  end
-
 
   describe '#show' do
     subject(:show) { netflix.show(filters) }
@@ -31,35 +22,31 @@ RSpec.describe Netflix do
 
       context 'when ancient movie' do
         let(:filters) { { period: :ancient } }
-        it { expect { show }.to change(netflix, :money).by(-1) }
+        it { expect { show }.to change(Netflix, :cash).by(-1) }
       end
 
       context 'when classic movie' do
         let(:filters) { { period: :classic } }
-        it { expect { show }.to change(netflix, :money).by(-1.5) }
+        it { expect { show }.to change(Netflix, :cash).by(-1.5) }
       end
 
       context 'when modern movie' do
         let(:filters) { { period: :modern } }
-        it { expect { show }.to change(netflix, :money).by(-3) }
+        it { expect { show }.to change(Netflix, :cash).by(-3) }
       end
 
       context 'when new movie' do
         let(:filters) { { period: :new } }
-        it { expect { show }.to change(netflix, :money).by(-5) }
+        it { expect { show }.to change(Netflix, :cash).by(-5) }
       end
 
-      # context 'when not enought money' do
-      #   let(:filters) { { period: :new } }
-      #   it do 
-      #     expect { show }.to change(netflix, :money).by(-5)
-      #     expect { netflix.show(period: :new) }.to raise_error(RuntimeError, "You have only 0.5 amount of money. The film's cost is 5 money.") 
-      #   end
-      # end
     end
 
     describe 'rise exception when not enought money' do
-      before { netflix.pay(0.5) }
+      before do 
+        Netflix.take('Bank') 
+        netflix.pay(0.5) 
+      end
       let(:filters) { { period: :new } }
 
       it { expect { netflix.show(period: :new) }.to raise_error(RuntimeError, "You have only 0.5 amount of money. The film's cost is 5 money.") }
@@ -92,5 +79,39 @@ RSpec.describe Netflix do
     end  
 
   end 
+
+  describe '#take' do
+    it { expect { netflix.take('Bank') }.to  raise_error(NotImplementedError,'Netflix#take not implemented') }
+  end
+
+  describe '.take' do
+    subject(:take) { Netflix.take(who) }
+    
+    context 'Bank can encashment' do
+      let(:who) { 'Bank' }
+      it { expect { take }.to output(/Encashment/).to_stdout }
+    end
+
+    context 'Bank can encashment' do
+      let(:who) { 'Thief' }
+      it { expect { take }.to raise_error(RuntimeError, "Error! Call the police!") } 
+    end    
+
+  end
+
+
+  describe '#cash' do
+    it { expect { netflix.cash }.to  raise_error(NotImplementedError,'Netflix#cash not implemented') }
+  end
+
+  describe '.cash' do
+    before { Netflix.take('Bank') }
+    subject { Netflix.cash }
+    it { is_expected.to eq 0 }
+    context 'after paying' do
+      before { netflix.pay(25) }
+      it { is_expected.to eq 25 }
+    end
+  end
 
 end

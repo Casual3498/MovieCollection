@@ -6,6 +6,13 @@ require './modern_movie.rb'
 require './new_movie.rb'
 
 class MovieCollection
+  include Enumerable
+  
+  def each(&block)
+    @films_array.each do |member|
+      block.call(member)
+    end
+  end
 
   KEYS_ARRAY = %i[href name year country date genres duration rank director actors]
 

@@ -1,10 +1,19 @@
-require './movie_collection.rb'
+require_relative 'movie_collection'
+require_relative 'cashbox'
 require 'time'
 
 class BaseCinema
+  include Cashbox 
 
   def initialize(filename = 'movies.txt')
     @movies = MovieCollection.new(filename)
+    @money = 0.0
+  end
+
+  def take(who)
+    raise 'Error! Call the police!' unless who == 'Bank'
+    puts 'Encashment'
+    @money = 0.0
   end
 
   def show(filter_value = {})
